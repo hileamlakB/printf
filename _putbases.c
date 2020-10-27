@@ -1,5 +1,4 @@
 #include "holberton.h"
-#include <stdio.h>
 /**
  * _putbin - prints the binary representation of a number
  * @num: input integer
@@ -33,10 +32,8 @@ int _putbin(va_list num)
 			start = 1;
 			len++;
 		}
-		printf("\n[%i]\n", len);
 		test = test >> 1;
 	}
-	printf("returning->%i,", len);
 	return (len);
 
 }
