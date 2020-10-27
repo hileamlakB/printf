@@ -1,29 +1,72 @@
 #include "holberton.h"
 
-/**                                                                                                                                                                       
- * _putchar - writes the character c to stdout                                                                                                                            
- * @c: an arg_list containing the character to be printed                                                                                                                 
- *                                                                                                                                                                        
- * Return: On success 1.                                                                                                                                                  
- * On error, return -1                                                                                                                                                    
- */
-int _putchar(va_list c)
-{
-        char a = va_arg(c, int);
 
-        return (write(1, &a, 1));
+
+/**
+ * _strlen - returns the length of a string
+ * @s: string s
+ * Return: length of string
+ */
+int _strlen(char *s)
+{
+
+	int length = 0;
+
+	while (*s)
+	{
+		s++;
+		length++;
+	}
+	return (length);
 }
 
-/**                                                                                                                                                                       
- * _putstr - writes the character c to stdout                                                                                                                             
- * @c: an arg list containing the string to be printed                                                                                                                    
- *                                                                                                                                                                        
- * Return: On success the lenght of the string printed                                                                                                                    
- * -1 on failure                                                                                                                                                          
+/**
+ * rev_string - reverses a string
+ * @s: string to be reversed
  */
-int _putstr(va_list c)
+void rev_string(char *s)
 {
-        char *s = va_arg(c, char *);
+	int length = _strlen(s);
+	int counter = 0;
+	char tmp;
 
-        return (write(1, s, _strlen(s)));
+	while (counter < length / 2)
+	{
+		tmp = *(s + counter);
+		*(s + counter) = *(s + length - 1 - counter);
+		*(s + length - 1 - counter) = tmp;
+		counter++;
+	}
+
+}
+
+
+/**
+ * _toStr - changes an int to a a string and saves it in nums
+ * @n:num
+* @nums:pointer to store the number
+*/
+void _toStr(unsigned int n, char *nums)
+{
+	if (n < 10)
+	{
+		*nums = (char)(n % 10 + 48);
+		return;
+	}
+	*nums = (char)(n % 10 + 48);
+	nums++;
+	_toStr(n / 10, nums);
+}
+
+
+/**
+ * _printstr - prints a string
+ * @c:string to be printed
+* Return:return the length of the string in succes
+* -1 in fauiler
+*/
+int _printstr(char *c)
+{
+
+	return (write(1, c, _strlen(c)));
 }
