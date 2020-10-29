@@ -1,6 +1,5 @@
 #include "holberton.h"
 
-
 /**
  *_pow - raises the number base to power power
  *@base : the base
