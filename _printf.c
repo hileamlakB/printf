@@ -12,9 +12,9 @@ int _printf(const char *format, ...)
 	char buffer[BUFFER_SIZE];
 
 	if (!format || !buffindex)
-		return (0);
+		return (-1);
 	if (*format == '%' && _strlen((char *)format) == 1)
-		return (0);
+		return (-1);
 
 	*buffindex = 0;
 	va_start(items, format);
@@ -99,7 +99,12 @@ printing_format *parse_format(const char *s)
 int buf_push(char *str, int *buffindex, char *buffer)
 {
 	int tmplen = _strlen(str), k = 0, printed = 0;
+	char null[] = "(null)";
 
+	if (str == NULL)
+		return (buf_push(null, buffindex, buffer));
+	if (str == '\0')
+		return (printed);
 	while (tmplen)
 	{
 		while (*buffindex + 1 < BUFFER_SIZE && *str)
@@ -156,7 +161,7 @@ int *print(const char *str, va_list items, int *buffindex, char *buffer)
 			{
 				tmp = (format->printer)(items, format);
 				if (!tmp)
-					return (NULL);
+					tmp = NULL;
 				buf_stat[1] = buf_push(tmp, buffindex, buffer);
 				buf_stat[0] = format->replaced;
 				free(tmp);

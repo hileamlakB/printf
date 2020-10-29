@@ -38,9 +38,11 @@ char *_putint(va_list num, printing_format *format)
 	{
 		if (n > 0)
 			*_nums = '+', _nums += 1;
-		else if (format->flag == ' ')
-			*_nums = ' ', _nums += 1;
 	}
+	else if (format->flag == ' ')
+		if (n > 0)
+			*_nums = ' ', _nums += 1;
+
 	/*change the number to a reversed string and reverse it*/
 	_toStr(n >= 0 ? n : -1 * n, _nums);
 	*(_nums + len) = '\0';

@@ -29,7 +29,7 @@ char *_putstr(va_list c, __attribute__((unused))printing_format * format)
 {
 	char *s = va_arg(c, char *), *s2 = malloc(sizeof(char) * _strlen(s) + 1);
 
-	if (!s2)
+	if (!s2 || !s)
 		return (NULL);
 	_strcpy(s2, s);
 	return (s2);

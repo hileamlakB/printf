@@ -51,3 +51,37 @@ int max(int a, int b)
 		return (a);
 	return (b);
 }
+
+/**
+ *to_hex - change an in into a hex
+ *@n: num
+ *Return: hex string
+ */
+char *to_hex(int n)
+{
+	char *s = malloc(sizeof(char) * n / 16 + 2), *_s;
+	int tmp;
+
+	if (!s)
+		return (NULL);
+	if (!n)
+	{
+		s[0] = '0', s[1] = '\0';
+		return (s);
+	}
+	_s = s;
+	while (n != 0)
+	{
+		tmp = n % 16;
+
+		if (tmp < 10)
+			*_s = tmp + 48;
+		else
+			*_s = tmp + 55;
+		n = n / 16;
+		_s++;
+	}
+	*_s = '\0';
+	rev_string(s);
+	return (s);
+}

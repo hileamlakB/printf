@@ -48,6 +48,7 @@ int checkwidth(printing_format *format, const char *s)
 {
 	int i = 0;
 
+
 	/*check for width*/
 	while (*(s + i) > 47 && *(s + i) < 58)
 	{

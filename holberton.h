@@ -75,6 +75,7 @@ char *(*get_printer(char id))(va_list, printing_format *);
 int _pow(unsigned int, int);
 int _numLen(unsigned int);
 int max(int, int);
+char *to_hex(int);
 
 /*string utils*/
 int _strlen(char *);

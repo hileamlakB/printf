@@ -13,8 +13,8 @@ char *_putrts(va_list list, __attribute__((unused)) printing_format * format)
 	if (!s2)
 		return (NULL);
 
-	rev_string(s);
 	_strcpy(s2, s);
+	rev_string(s2);
 	return (s2);
 
 }
@@ -33,7 +33,8 @@ char *_putrot13(va_list list, __attribute__((unused)) printing_format * format)
 	if (!s2)
 		return (NULL);
 
-	_strcpy(s2, rot13(s));
+	_strcpy(s2, s);
+	rot13(s2);
 	return (s2);
 
 }
@@ -49,43 +50,36 @@ char *_putrot13(va_list list, __attribute__((unused)) printing_format * format)
  */
 char *_putS(va_list l, __attribute__((unused)) printing_format * format)
 {
-	char *s1, *s2, *s = va_arg(l, char *);
-	int n, tmp;
+	char *_s2, *s2, *hex, *_hex, *s = va_arg(l, char *);
+	int n;
 
 	if (!s)
 		return (NULL);
 	s2 = malloc(sizeof(char) * _strlen(s) * 4 + 1);
 	if (!s2)
 		return (NULL);
-	s1 = s2;
+	_s2 = s2;
 	while (*s)
 	{
 		n = *s;
 		if ((n > 0 && n < 32) || n >= 127)
 		{
-			*s1 = '\\', *(s1 + 1) = 'x';
-			s1 += 2;
+			*_s2 = '\\', *(_s2 + 1) = 'x';
+			_s2 += 2;
 			if (n < 16)
-			{
-				*s1 = '0';
-				s1++;
-			}
-			while (n != 0)
-			{
-				tmp = n % 16;
-
-				if (tmp < 10)
-					*s1 = tmp + 48;
-				else
-					*s1 = tmp + 55;
-				n = n / 16;
-				s1++;
-			}
+				*_s2 = '0', _s2 += 1;
+			hex = to_hex(n);
+			if (!hex)
+				return (NULL);
+			_hex = hex;
+			while (*_hex)
+				*_s2 = *_hex, _s2 += 1, _hex += 1;
+			free(hex);
 		}
 		else
-			*s1 = *s, s1 += 1;
+			*_s2 = *s, _s2 += 1;
 		s++;
 	}
-	s1 = '\0';
+	_s2 = '\0';
 	return (s2);
 }
