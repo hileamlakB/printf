@@ -38,7 +38,7 @@ char *_putrot13(va_list list, __attribute__((unused)) printing_format * format)
 
 }
 /**
- * print_bigS - Non printable characters
+ * _putS - Non printable characters
  * (0 < ASCII value < 32 or >= 127) are
  * printed this way: \x, followed by the ASCII code
  * value in hexadecimal (upper case - always 2 characters)
@@ -55,18 +55,17 @@ char *_putS(va_list l, __attribute__((unused)) printing_format * format)
 	if (!s)
 		return (NULL);
 	s2 = malloc(sizeof(char) * _strlen(s) * 4 + 1);
-	if(!s2)
+	if (!s2)
 		return (NULL);
 	s1 = s2;
-	while(*s)
+	while (*s)
 	{
 		n = *s;
 		if ((n > 0 && n < 32) || n >= 127)
 		{
-			*s1 = '\\';
-			*(s1 + 1) = 'x';
+			*s1 = '\\', *(s1 + 1) = 'x';
 			s1 += 2;
-			if(n < 16)
+			if (n < 16)
 			{
 				*s1 = '0';
 				s1++;
@@ -82,13 +81,9 @@ char *_putS(va_list l, __attribute__((unused)) printing_format * format)
 				n = n / 16;
 				s1++;
 			}
-
 		}
 		else
-		{
-			*s1 = *s;
-			s1++;
-		}
+			*s1 = *s, s1 += 1;
 		s++;
 	}
 	s1 = '\0';

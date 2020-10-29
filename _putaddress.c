@@ -1,18 +1,21 @@
 #include "holberton.h"
 
-
 /**
  * _putadress - prints the adress of a memory in hex form
  * @num: input integer (memory location as ui insided a va_list)
+ * @format: the format the string must be returned with
  * Return: length of hex
  */
-int _putadress(va_list num)
+char *_putadress(va_list num, __attribute__((unused))printing_format * format)
 {
 	unsigned long int n = va_arg(num, unsigned long int);
-	char *nums =  malloc(sizeof(char) * _numLen(n) + 1);
+	char *nums =  malloc(sizeof(char) * _numLen(n) * 2 + 3);
 	int i = 0, tmp;
 
-	write(1, &("0x"), 2);
+	if (!nums || !n)
+		return (NULL);
+	nums[0] = '0', nums[1] = 'x';
+	nums += 2;
 
 	while (n != 0)
 	{
@@ -27,8 +30,7 @@ int _putadress(va_list num)
 	}
 	nums[i] = '\0';
 	rev_string(nums);
-	i = 2 + _printstr(nums);
-	free(nums);
-	return (i);
+	nums -= 2;
+	return (nums);
 }
 

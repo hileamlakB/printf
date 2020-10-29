@@ -1,5 +1,4 @@
 #include "holberton.h"
-
 /**
  * _printf - a function that prints anything using
  *           posix callex via the write function
@@ -8,121 +7,172 @@
  */
 int _printf(const char *format, ...)
 {
-
 	va_list items;
-	int size;
+	int i = 0, len = 0, *printed, *buffindex = malloc(sizeof(int));
+	char buffer[BUFFER_SIZE];
 
+	if (!format || !buffindex)
+		return (0);
+	if (*format == '%' && _strlen((char *)format) == 1)
+		return (0);
+
+	*buffindex = 0;
 	va_start(items, format);
-	size = _printf_rec(format, items);
+	while (*(format + i))
+	{
+		printed = print(format + i, items, buffindex, buffer);
+		if (!printed)
+			return (-1);
+		len += printed[1];
+		i += printed[0];
+		free(printed);
+	}
+	if (*buffindex)
+	{
+		i = write(1, buffer, *buffindex);
+		if (i == -1)
+			return (-1);
+		len += i;
+	}
 	va_end(items);
-	if (size < 0)
-		return (-1);
-	return (size);
-
-}
-/**
- *find - returns the index of the first apearing patter in s
- *@s: string
- *@pattern: pattern to look for
- *Return: the index of pattern in s or the length of s if pattern not found
- */
-int find(const char *s, char pattern)
-{
-	int i = 0;
-
-	while (*(s + i))
-	{
-		if (*(s + i) == pattern)
-			break;
-		i++;
-	}
-	return (i);
+	free(buffindex);
+	return (len);
 }
 
 /**
- *print - prints an element inside a va_list using
- *  a printer function that is passed as an argment based on a formated string
- *  the formated string will be used to identify what to print in case no print
- *  funciton is passed
- *@printer:  pointer to pritner functuion
- *@list: va_list containing the item to be printed
- *@format:  a formated string that starts with % followed by a possible
- *        identifier character
- *Return: an array containing the length of the string printed and the number
- *of items reolaced in the formated string in case of success and
- *an array containign -1 in case of failure
+ *parse_format - takes a string and parse it in a printing format
+ *for example if the str starts with %34f, this will be parse as
+ *a float of length 34. This function always assums that the str
+ *passed starts with %
+ *@s: the string to be parsed that starts with %
+ *Return:a struct containg the parsed values
  */
-int *print(int (*printer)(va_list), va_list list, const char *format)
+printing_format *parse_format(const char *s)
 {
-	int buff;
-	int *arr = malloc(sizeof(int) * 2);
-	/*
-	 *arr[0] -> the characters printed instead of the formated characters
-	 *arr[1] ->  the characters replaced from the fromated string
-	 */
-	if (printer)
-	{
-		buff = printer(list);
-		if (buff == -1)
-			arr[0] = -1, arr[1] = -1;
+	int i = 1;
+	char tmp;
+	printing_format *format = malloc(sizeof(printing_format));
 
-		arr[0] = buff;
-		/*if printer was successful '%(id)' is repaced*/
-		arr[1] = 2;
-	}
-	else
+	if (!format)
+		return (NULL);
+	format->replaced = 0, format->width = 0, format->validity = false;
+
+	i += checkflag(format, *(s + i));
+	i += checkwidth(format, s + i);
+
+	/*make sure that no usless character in between exists*/
+	tmp = *(s + i);
+	if (tmp == '.' || is_valid_id(tmp) || tmp == 'l' || tmp == 'h')
 	{
-		/*one of the cases a printer might be null is if we are trying to print %%*/
-		if (*(format + 1) == '%')
+		if (*(s + i) == '.')
 		{
-			if (write(1, &("%"), 1) == -1)
-				arr[0] = -1, arr[1] = -1;
+			i++;
+			i += checkprecision(format, s + i);
+		}
+		i += checkmod(format, s + i);
 
-			arr[0] = 1;
+		if (is_valid_id(*(s + i)))
+		{
+			format->printer = get_printer(*(s + i));
+			format->replaced += 1;
+			i++;
 		}
 		else
 		{
-			if (write(1, (format), 2) == -1)
-				arr[0] = -1, arr[1] = -1;
-			arr[0] = 2;
+			format->validity = false;
+			return (format);
 		}
-		arr[1] = 2;
+		format->validity = true;
+		format->replaced += 1;
 	}
-	return (arr);
-
+	return (format);
 }
 /**
- * _printf_rec - prints in a recursive manner calling
- *               itself when finding a format identifer
- * @format: format string
- * @list: a varadic list containing
- *        elements to be printed in place of the format identifers
- * Return: returns the number of characters that has been printed
+ *buf_push - saves a string to a temporaty printing buffer
+ *and returns the length of things compied or -1 on failure
+ *@str:string top be copied
+ *@buffindex: the current index of the buffer
+ *@buffer: the printint que
+ *Return: the length of string printed (the once that overflowed)
+ *from the buffer
  */
-int _printf_rec(const char *format, va_list list)
+int buf_push(char *str, int *buffindex, char *buffer)
 {
-	int i = 0, len = 0, (*printer)(va_list), *presult;
+	int tmplen = _strlen(str), k = 0, printed = 0;
 
-	if (!*format)
-		return (0);
-
-	i = find(format, '%');
-	len = write(1, format, i);
-	if (len == -1)
-		return (-2147483648);
-	if (*(format + i))
+	while (tmplen)
 	{
-		printer = get_printer(*(format + i + 1));
-		presult = print(printer, list, format + i);
+		while (*buffindex + 1 < BUFFER_SIZE && *str)
+		{
 
-		if (presult[0] == -1 && presult[1] == -1)
-			return (-2147483648);
-		len += presult[0];
-		i += presult[1];
-
-		free(presult);
+			buffer[*buffindex] = *(str);
+			*buffindex += 1, str += 1, tmplen -= 1;
+		}
+		if (*buffindex + 1 >= BUFFER_SIZE)
+		{
+			k = write(1, buffer, BUFFER_SIZE);
+			if (k == -1)
+				return (-1);
+			*buffindex = 0;
+			printed += k;
+		}
 
 	}
+	return (printed);
+}
 
-	return (len + _printf_rec(format + i, list));
+/**
+ *print - stores an element into a buffer based on a formated string
+ *it also takes va_list incase the formated strin refers to an element
+ *  a printer function that is passed as an argment, if buffer is full
+ * prints and reinitializes the buffer
+ *@str:  format string
+ *@items: va_list containing the item to be printed accouring to the format
+ *@buffindex: the current index of the printe queue
+ *@buffer: printing queue
+ *Return: [replaced formate string, len of printed]
+ * replaced or [-1, -1] on error
+ */
+int *print(const char *str, va_list items, int *buffindex, char *buffer)
+{
+	char *tmp = NULL, perstr[] = "%", *tmpstr = malloc(sizeof(char) * 2);
+	int *buf_stat = malloc(sizeof(int) * 2);
+	printing_format *format = NULL;
+
+	if (!tmpstr || !buf_stat)
+		return (NULL);
+	tmpstr[1] = '\0', buf_stat[0] = buf_stat[1] = -1;
+	if (*(str) != '%')
+	{
+		tmpstr[0] = *str;
+		buf_stat[1] = buf_push(tmpstr, buffindex, buffer), buf_stat[0] = 1;
+	}
+	else
+	{
+		format = parse_format(str);
+		if (format)
+		{
+			if (format->validity)
+			{
+				tmp = (format->printer)(items, format);
+				if (!tmp)
+					return (NULL);
+				buf_stat[1] = buf_push(tmp, buffindex, buffer);
+				buf_stat[0] = format->replaced;
+				free(tmp);
+			}
+			else
+			{
+				buf_stat[1] = buf_push(perstr, buffindex, buffer);
+				/*incase I have %% the second one must be ignored*/
+				if (*(str + 1) == '%')
+					buf_stat[0] = 2;
+				else
+					buf_stat[0] = 1;
+			}
+		}
+	}
+	free(format);
+	free(tmpstr);
+	return (buf_stat);
 }

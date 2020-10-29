@@ -43,9 +43,9 @@ void rev_string(char *s)
 /**
  * _toStr - changes an int to a a string and saves it in nums
  * @n:num
- * @nums:pointer to store the number
- */
-void _toStr(unsigned int n, char *nums)
+* @nums:pointer to store the number
+*/
+void _toStr(unsigned long int n, char *nums)
 {
 	if (n < 10)
 	{

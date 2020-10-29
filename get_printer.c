@@ -1,14 +1,15 @@
 #include "holberton.h"
 /**
-*get_printer - returns the correct type of printer function based on a delieter
-*@id: a delimeter
-*Return: a function pointer,
-*
-*/
-int (*get_printer(char id))(va_list)
+ *get_printer - returns the correct pointer
+ *to function based on a specifier character
+ *@id: a delimeter
+ *Return: a function pointer,
+ *
+ */
+char *(*get_printer(char id))(va_list, printing_format *)
 {
 
-	int (*printer)(va_list);
+	char *(*printer)(va_list, printing_format *);
 
 	switch (id)
 	{
@@ -49,6 +50,18 @@ int (*get_printer(char id))(va_list)
 
 		case 'p':
 			printer = _putadress;
+			break;
+
+		case 'r':
+			printer = _putrts;
+			break;
+
+		case 'R':
+			printer = _putrot13;
+			break;
+
+		case 'S':
+			printer = _putS;
 			break;
 
 		default:

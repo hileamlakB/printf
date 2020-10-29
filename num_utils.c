@@ -1,5 +1,6 @@
 #include "holberton.h"
 
+
 /**
  *_pow - raises the number base to power power
  *@base : the base
@@ -36,4 +37,17 @@ int _numLen(unsigned int num)
 	}
 
 	return (length);
+}
+
+/**
+ *max - returns max of two strings
+ *@a : num 1
+ *@b: num 2
+ *Return: the great of a or b
+ */
+int max(int a, int b)
+{
+	if (a > b)
+		return (a);
+	return (b);
 }
