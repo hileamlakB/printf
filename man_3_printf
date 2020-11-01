@@ -87,9 +87,10 @@ base.
 .sp
 .SH SEE ALSO
 .I printf(3)
-.I _putchar.c
 .sp
 .SH BUGS
-_printf does not take care of length and precision modifiers yet. For example, _printf(\(dq%hx\(dq) will not produce the same output as the call to the standard library printf.
+_printf does not take care of precision yet. For example, _printf(\(dq%.56x\(dq) will not produce the same output as the call to the standard library printf. 
+-Ther are some undefined behaviours with some edge cases like printing '%' and so on. (querks here and there)
+-The printerqeue(the buffer)doesnt always store 1024 character before making the sytem calls ther are some unidentified problems
 .SH AUTHORS
 Hileamlak M. Yitayew and Pacifique Irakoze, Cohort 0.
